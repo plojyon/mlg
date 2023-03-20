@@ -140,7 +140,6 @@ def nx2hetero(graph_getter):
     # post-processing
     hetero = torch_geometric.transforms.ToUndirected()(hetero)
     hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
-    hetero = torch_geometric.transforms.ToSparseTensor()(hetero)
     hetero = torch_geometric.transforms.NormalizeFeatures()(hetero)
     assert hetero.validate()
     return hetero
