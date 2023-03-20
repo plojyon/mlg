@@ -8,7 +8,7 @@ class GNN(torch.nn.Module):
         super().__init__()
         self.conv = []
         for i in range(args["layers"]):
-            self.conv.append(torch_geometric.nn.GraphConv((-1, -1), hidden_channels, normalize=args["normalize"][i], dropout=args["dropout"][i], project=args["project"][i]))
+            self.conv.append(torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=args["normalize"][i], dropout=args["dropout"][i], project=args["project"][i]))
         
 
     def forward(self, x, edge_index):
