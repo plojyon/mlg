@@ -1,6 +1,7 @@
 import torch
 import torch_geometric
 
+
 class GNN(torch.nn.Module):
     def __init__(self, hidden_channels):
         super().__init__()
@@ -65,8 +66,7 @@ def train(model, train_loader, optimizer):
     total_examples = total_loss = 0
     for batch in train_loader:
         optimizer.zero_grad()
-        batch = batch.to('cuda:0')
-        batch_size = 100
+        
         out = model(batch)
         loss = torch.nn.functional.cross_entropy(
             out, batch["track", "contains", "playlist"].edge_label
@@ -74,8 +74,8 @@ def train(model, train_loader, optimizer):
         loss.backward()
         optimizer.step()
 
-        total_examples += batch_size
+        total_examples += len(out)
         print(f'Loss: {loss:.4f}')
-        total_loss += float(loss) * batch_size
+        total_loss += float(loss) * len(out)
 
     return total_loss / total_examples

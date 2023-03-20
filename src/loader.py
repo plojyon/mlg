@@ -1,11 +1,14 @@
-import networkx as nx
+import json
+import os
 import pickle
-from tqdm import tqdm
+
+import networkx as nx
 import torch
 import torch_geometric
-import os
-import json
+from tqdm import tqdm
+
 import config
+
 
 def load_graph(dataset_path=config.dataset_path):
     """Load a nx.Graph from disk."""
@@ -49,17 +52,46 @@ def nx2hetero(graph_getter):
         "artist": [],
         "album": []
     }
+
+    # {
+    #     "name": "musical",
+    #     "collaborative": "false",
+    #     "pid": 5,
+    #     "modified_at": 1493424000,
+    #     "num_albums": 7,
+    #     "num_tracks": 12,
+    #     "num_followers": 1,
+    #     "num_edits": 2,
+    #     "duration_ms": 2657366,
+    #     "num_artists": 6,
+    #     "tracks": [
+    #         {
+    #             "pos": 0,
+    #             "artist_name": "Degiheugi",
+    #             "track_uri": "spotify:track:7vqa3sDmtEaVJ2gcvxtRID",
+    #             "artist_uri": "spotify:artist:3V2paBXEoZIAhfZRJmo2jL",
+    #             "track_name": "Finalement",
+    #             "album_uri": "spotify:album:2KrRMJ9z7Xjoz1Az4O6UML",
+    #             "duration_ms": 166264,
+    #             "album_name": "Dancing Chords and Fireflies"
+    #         },
+    #     ],
+
+    # }
     for node in G.nodes(data=True):
         t = node[1]["node_type"]
         node_id(t, node[0])
         if t == "playlist":
-            node_features_by_type["playlist"] += [node[1]["num_followers"]]
+            node_features_by_type["playlist"] += [[node[1]["num_followers"], node[1]["collaborative"], node[1]["num_albums"], node[1]["num_tracks"], node[1]["num_edits"], node[1]["duration_ms"], node[1]["num_artists"]]]
         elif t == "track":
-            node_features_by_type["track"] += [node[1]["duration"]]
+            distances = nx.single_source_shortest_path_length(G, node[0], cutoff=2)
+            node_features_by_type["track"] += [[node[1]["duration"], len(distances)]]
         elif t == "artist":
-            node_features_by_type["artist"] += [1]
+            distances = nx.single_source_shortest_path_length(G, node[0], cutoff=2)
+            node_features_by_type["artist"] += [[len(distances)]]
         elif t == "album":
-            node_features_by_type["album"] += [1]
+            distances = nx.single_source_shortest_path_length(G, node[0], cutoff=2)
+            node_features_by_type["album"] += [[len(distances)]]
 
     edge_index_by_type = {
         ("track", "contains", "playlist"): [],
@@ -70,14 +102,20 @@ def nx2hetero(graph_getter):
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
             s_id = node_id("track", edge[0])
             d_id = node_id("playlist", edge[1])
+
+            node_features_by_type["track"][s_id] 
+
             edge_index_by_type[("track", "contains", "playlist")] += [(s_id, d_id)]
         elif G[edge[0]][edge[1]]["edge_type"] == "track-album":
             s_id = node_id("track", edge[0])
             d_id = node_id("album", edge[1])
+
             edge_index_by_type[("track", "includes", "album")] += [(s_id, d_id)]
+
         elif G[edge[0]][edge[1]]["edge_type"] == "track-artist":
             s_id = node_id("track", edge[0])
             d_id = node_id("artist", edge[1])
+
             edge_index_by_type[("track", "authors", "artist")] += [(s_id, d_id)]
 
     # construct HeteroData
