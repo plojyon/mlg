@@ -28,7 +28,7 @@ class HeteroModel(torch.nn.Module):
         # embedding matrices for users and movies:
 
         self.node_lin = {
-            k: torch.nn.Linear(v.shape[1], hidden_channels, weight_initializer="glorot") for k, v in node_features.items()
+            k: torch_geometric.nn.Linear(v.shape[1], hidden_channels, weight_initializer="glorot") for k, v in node_features.items()
         }
 
         
