@@ -78,9 +78,10 @@ def nx2hetero(graph_getter):
     #     ],
 
     # }
+    print(next(G.nodes(data=True)))
+
     for node in G.nodes(data=True):
         t = node[1]["node_type"]
-        print(node)
         node_id(t, node[0])
         if t == "playlist":
             node_features_by_type["playlist"] += [[node[1]["num_followers"], node[1]["collaborative"], node[1]["num_albums"], node[1]["num_tracks"], node[1]["num_edits"], node[1]["duration_ms"], node[1]["num_artists"]]]
