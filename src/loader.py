@@ -83,7 +83,9 @@ def nx2hetero(graph_getter):
         t = node[1]["node_type"]
         node_id(t, node[0])
         if t == "playlist":
-            node_features_by_type["playlist"] += [[node[1]["num_followers"], node[1]["collaborative"], node[1]["num_albums"], node[1]["num_tracks"], node[1]["num_edits"], node[1]["duration_ms"], node[1]["num_artists"]]]
+            if node[1]["collaborative"] not in ("true", "false"):
+                raise ValueError(f"collaborative is not a boolean: {node[1]['collaborative']}")
+            node_features_by_type["playlist"] += [[node[1]["num_followers"], node[1]["collaborative"] == 'true', node[1]["num_albums"], node[1]["num_tracks"], node[1]["num_edits"], node[1]["duration_ms"], node[1]["num_artists"]]]
         elif t == "track":
             distances = nx.single_source_shortest_path_length(G, node[0], cutoff=2)
             node_features_by_type["track"] += [[node[1]["duration"], len(distances)]]
