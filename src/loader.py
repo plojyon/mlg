@@ -149,7 +149,6 @@ def ghetero2datasets(ghetero):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     """Split the dataset into train, validation and test sets."""
     transform = T.Compose([
-        T.NormalizeFeatures(),
         T.RandomLinkSplit(
             num_val=0.1,
             num_test=0.1,
