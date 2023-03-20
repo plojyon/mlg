@@ -70,7 +70,7 @@ class Main():
     def get_args(self):
         return self.args
 
-    def run(self, graph_render_freq=-1, batch_wrapper=loader.dummy_generator):
+    def run(self, graph_render_freq=-1, batch_wrapper=M.dummy_generator):
         losses = []
         accuracies = []
 
