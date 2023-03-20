@@ -182,5 +182,5 @@ def get_cached(var, pickled_filename, fallback, ignore_cache=False):
         return obj
 
 get_g = lambda i=False, c=config: get_cached("G", c.pickled_graph, fallback=load_graph, ignore_cache=i)
-get_ghetero = lambda i=False, c=config: get_cached("ghetero", c.pickled_ghetero, fallback=lambda: nx2hetero(get_g()), ignore_cache=i)
-get_datasets = lambda i=False, c=config: get_cached("datasets", c.pickled_datasets, fallback=lambda: ghetero2datasets(get_ghetero()), ignore_cache=i)
+get_ghetero = lambda i=False, c=config: get_cached("ghetero", c.pickled_ghetero, fallback=lambda: nx2hetero(get_g(i,c)), ignore_cache=i)
+get_datasets = lambda i=False, c=config: get_cached("datasets", c.pickled_datasets, fallback=lambda: ghetero2datasets(get_ghetero(i,c)), ignore_cache=i)
