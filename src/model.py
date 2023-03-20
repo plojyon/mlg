@@ -59,12 +59,15 @@ class HeteroModel(torch.nn.Module):
             torch.nn.init.xavier_uniform_(v.weight)
         self.gnn.reset_parameters()
 
+def dummy_generator(source):
+    for e in source:
+        yield e
 
-def train(model, train_loader, optimizer):
+def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
     model.train()
 
     total_examples = total_loss = 0
-    for batch in train_loader:
+    for batch in batch_wrapper(train_loader):
         optimizer.zero_grad()
         
         out = model(batch)
