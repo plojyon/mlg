@@ -77,8 +77,7 @@ def nx2hetero(graph_getter):
     #         },
     #     ],
 
-    # }
-    print(next(G.nodes(data=True)))
+    # })
 
     for node in G.nodes(data=True):
         t = node[1]["node_type"]
@@ -94,6 +93,7 @@ def nx2hetero(graph_getter):
         elif t == "album":
             distances = nx.single_source_shortest_path_length(G, node[0], cutoff=2)
             node_features_by_type["album"] += [[len(distances)]]
+    print(node_features_by_type["playlist"][0])
 
     edge_index_by_type = {
         ("track", "contains", "playlist"): [],
