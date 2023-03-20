@@ -11,8 +11,9 @@ from tqdm import tqdm
 import config
 
 
-def load_graph(dataset_path=config.dataset_path):
+def load_graph(config=config):
     """Load a nx.Graph from disk."""
+    dataset_path = config.dataset_path
     filenames = os.listdir(dataset_path)
     G = nx.DiGraph()
     for i in tqdm(range(len(filenames)), unit="files"):
@@ -182,6 +183,6 @@ def get_cached(var, pickled_filename, fallback, ignore_cache=False):
         print(f"{var} generated, pickle saved to {pickled_filename}")
         return obj
 
-get_g = lambda i=False, c=config: get_cached("G", c.pickled_graph, fallback=load_graph, ignore_cache=i)
+get_g = lambda i=False, c=config: get_cached("G", c.pickled_graph, fallback=lambda: load_graph(c), ignore_cache=i)
 get_ghetero = lambda i=False, c=config: get_cached("ghetero", c.pickled_ghetero, fallback=lambda: nx2hetero(get_g(i,c)), ignore_cache=i)
 get_datasets = lambda i=False, c=config: get_cached("datasets", c.pickled_datasets, fallback=lambda: ghetero2datasets(get_ghetero(i,c)), ignore_cache=i)
