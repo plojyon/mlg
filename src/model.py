@@ -1,0 +1,81 @@
+import torch
+import torch_geometric
+
+class GNN(torch.nn.Module):
+    def __init__(self, hidden_channels):
+        super().__init__()
+        self.conv1 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True)
+        self.conv2 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True)
+
+    def forward(self, x, edge_index):
+        x = self.conv1(x, edge_index).relu()
+        x = self.conv2(x, edge_index)
+        return x
+
+class LinkPredictor(torch.nn.Module):
+    def forward(self, x_track, x_playlist, track_playlist_edge):
+        track_embedding = x_track[track_playlist_edge[0]]
+        playlist_embedding = x_playlist[track_playlist_edge[1]]
+
+        # Apply dot-product to get a prediction per supervision edge:
+        return (playlist_embedding * track_embedding).sum(dim=-1)
+
+class HeteroModel(torch.nn.Module):
+    def __init__(self, hidden_channels, node_features, metadata):
+        super().__init__()
+        # Since the dataset does not come with rich features, we also learn two
+        # embedding matrices for users and movies:
+
+        self.node_lin = {
+            k: torch.nn.Linear(v.shape[1], hidden_channels) for k, v in node_features.items()
+        }
+
+        for _, v in self.node_lin.items():
+            torch.nn.init.xavier_uniform_(v.weight)
+        
+        # Instantiate homogeneous GNN:
+        self.gnn = GNN(hidden_channels)
+        # Convert GNN model into a heterogeneous variant:
+        self.gnn = torch_geometric.nn.to_hetero(self.gnn, metadata=metadata)
+
+        self.classifier = LinkPredictor()
+
+    def forward(self, data):
+        x_dict = {
+            k: self.node_lin[k](v) for k, v in data.x_dict.items()
+        }
+        
+        x_dict = self.gnn(x_dict, data.edge_index_dict)
+        pred = self.classifier(
+            x_dict["track"],
+            x_dict["playlist"],
+            data["track", "contains", "playlist"].edge_label_index,
+        )
+        return pred
+
+    def reset_parameters(self):
+        for _, v in self.node_lin.items():
+            torch.nn.init.xavier_uniform_(v.weight)
+        self.gnn.reset_parameters()
+
+
+def train(model, train_loader, optimizer):
+    model.train()
+
+    total_examples = total_loss = 0
+    for batch in train_loader:
+        optimizer.zero_grad()
+        batch = batch.to('cuda:0')
+        batch_size = 100
+        out = model(batch)
+        loss = torch.nn.functional.cross_entropy(
+            out, batch["track", "contains", "playlist"].edge_label
+        )
+        loss.backward()
+        optimizer.step()
+
+        total_examples += batch_size
+        print(f'Loss: {loss:.4f}')
+        total_loss += float(loss) * batch_size
+
+    return total_loss / total_examples
