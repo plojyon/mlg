@@ -148,7 +148,6 @@ def ghetero2datasets(ghetero):
     """Split the dataset into train, validation and test sets."""
     transform = T.Compose([
         T.NormalizeFeatures(),
-        T.ToDevice(device),
         T.RandomLinkSplit(
             num_val=0.1,
             num_test=0.1,
