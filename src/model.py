@@ -1,16 +1,19 @@
 import torch
 import torch_geometric
+from torcheval.metrics import BinaryAccuracy
 
 
 class GNN(torch.nn.Module):
-    def __init__(self, hidden_channels, dropout):
+    def __init__(self, hidden_channels, args):
         super().__init__()
-        self.conv1 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=dropout)
-        self.conv2 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=dropout)
+        self.conv = []
+        for i in range(args["layers"]):
+            self.conv.append(torch_geometric.nn.GraphConv((-1, -1), hidden_channels, normalize=args["normalize"][i], dropout=args["dropout"][i], project=args["project"][i]))
+        
 
     def forward(self, x, edge_index):
-        x = self.conv1(x, edge_index).relu()
-        x = self.conv2(x, edge_index)
+        for conv in self.conv:
+            x = conv(x, edge_index)
         return x
 
 class LinkPredictor(torch.nn.Module):
@@ -22,18 +25,18 @@ class LinkPredictor(torch.nn.Module):
         return (playlist_embedding * track_embedding).sum(dim=-1)
 
 class HeteroModel(torch.nn.Module):
-    def __init__(self, hidden_channels, node_features, metadata, dropout=0):
+    def __init__(self, hidden_channels, node_features, metadata, graph_sage_arg, weight_initializer="glorot"):
         super().__init__()
         # Since the dataset does not come with rich features, we also learn two
         # embedding matrices for users and movies:
 
         self.node_lin = {
-            k: torch_geometric.nn.Linear(v.shape[1], hidden_channels, weight_initializer="glorot") for k, v in node_features.items()
+            k: torch_geometric.nn.Linear(v.shape[1], hidden_channels, weight_initializer=weight_initializer) for k, v in node_features.items()
         }
 
         
         # Instantiate homogeneous GNN:
-        self.gnn = GNN(hidden_channels, dropout=dropout)
+        self.gnn = GNN(hidden_channels, args=graph_sage_arg)
         # Convert GNN model into a heterogeneous variant:
         self.gnn = torch_geometric.nn.to_hetero(self.gnn, metadata=metadata)
 
@@ -57,6 +60,12 @@ class HeteroModel(torch.nn.Module):
             torch.nn.init.xavier_uniform_(v.weight)
         self.gnn.reset_parameters()
 
+    def to_device(self, *args, **kwargs):
+        self.to(*args, **kwargs)
+        self.gnn.to(*args, **kwargs)
+        for _, v in self.node_lin.items():
+            v.to(*args, **kwargs)
+
 def dummy_generator(source):
     for e in source:
         yield e
@@ -64,18 +73,24 @@ def dummy_generator(source):
 def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
     model.train()
 
-    total_examples = total_loss = 0
+    accuracy = total_examples = total_loss = 0
     for batch in batch_wrapper(train_loader):
         optimizer.zero_grad()
         
+        # forward pass
         out = model(batch)
-        loss = torch.nn.functional.cross_entropy(
-            out, batch["track", "contains", "playlist"].edge_label
-        )
+        true_labels = batch["track", "contains", "playlist"].edge_label
+        loss = torch.nn.functional.mse_loss(out, true_labels)
         loss.backward()
         optimizer.step()
 
+        # calculate loss
         total_examples += len(out)
         total_loss += float(loss) * len(out)
 
-    return total_loss / total_examples
+        # calculate binary accuracy
+        metric = BinaryAccuracy()
+        metric.update(out.to('cpu'), true_labels.to('cpu'))
+        accuracy += metric.compute() * len(out)
+
+    return total_loss / total_examples, accuracy / total_examples
