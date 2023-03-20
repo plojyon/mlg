@@ -173,6 +173,6 @@ def get_cached(var, pickled_filename, fallback, ignore_cache=False):
         print(f"{var} generated, pickle saved to {pickled_filename}")
         return obj
 
-get_g = lambda i=False: get_cached("G", config.pickled_graph, fallback=load_graph, ignore_cache=i)
-get_ghetero = lambda i=False: get_cached("ghetero", config.pickled_ghetero, fallback=lambda: nx2hetero(get_g()), ignore_cache=i)
-get_datasets = lambda i=False: get_cached("datasets", config.pickled_datasets, fallback=lambda: ghetero2datasets(get_ghetero()), ignore_cache=i)
+get_g = lambda i=False, c=config: get_cached("G", c.pickled_graph, fallback=load_graph, ignore_cache=i)
+get_ghetero = lambda i=False, c=config: get_cached("ghetero", c.pickled_ghetero, fallback=lambda: nx2hetero(get_g()), ignore_cache=i)
+get_datasets = lambda i=False, c=config: get_cached("datasets", c.pickled_datasets, fallback=lambda: ghetero2datasets(get_ghetero()), ignore_cache=i)
