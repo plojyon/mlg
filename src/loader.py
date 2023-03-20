@@ -19,7 +19,7 @@ def load_graph(dataset_path=config.dataset_path):
             playlists = json.load(json_file)["playlists"]
             for playlist in playlists:
                 playlist_name = f"spotify:playlist:{playlist['pid']}"
-                G.add_node(playlist_name, node_type="playlist", num_followers=playlist["num_followers"])
+                G.add_node(playlist_name, node_type="playlist", num_followers=playlist["num_followers"], num_tracks=playlist["num_tracks"], num_artists=playlist["num_artists"], num_albums=playlist["num_albums"], duration_ms=playlist["duration_ms"], collaborative=playlist["collaborative"], num_edits=playlist["num_edits"])
                 for track in playlist["tracks"]:
                     G.add_node(track["track_uri"], node_type="track", duration=track["duration_ms"])
                     G.add_node(track["album_uri"], node_type="album")
