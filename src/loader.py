@@ -6,6 +6,7 @@ import networkx as nx
 import torch
 import torch_geometric
 from tqdm import tqdm
+import torch_geometric.transforms as T
 
 import config
 
@@ -143,16 +144,21 @@ def nx2hetero(graph_getter):
     return hetero
 
 def ghetero2datasets(ghetero):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     """Split the dataset into train, validation and test sets."""
-    transform = torch_geometric.transforms.RandomLinkSplit(
-        num_val=0.1,
-        num_test=0.1,
-        disjoint_train_ratio=0.3, # TODO: move settings to config.py
-        neg_sampling_ratio=2.0,
-        add_negative_train_samples=False,
-        edge_types=("track", "contains", "playlist"),
-        rev_edge_types=("playlist", "rev_contains", "track"),
-    )
+    transform = T.Compose([
+        T.NormalizeFeatures(),
+        T.ToDevice(device),
+        T.RandomLinkSplit(
+            num_val=0.1,
+            num_test=0.1,
+            disjoint_train_ratio=0.3, # TODO: move settings to config.py
+            neg_sampling_ratio=2.0,
+            add_negative_train_samples=False,
+            edge_types=("track", "contains", "playlist"),
+            rev_edge_types=("playlist", "rev_contains", "track"),
+        )
+    ])
 
     return transform(ghetero)  # 3-tuple: data_train, data_val, data_test
 
