@@ -78,7 +78,6 @@ def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
         optimizer.step()
 
         total_examples += len(out)
-        print(f'Loss: {loss:.4f}')
         total_loss += float(loss) * len(out)
 
     return total_loss / total_examples
