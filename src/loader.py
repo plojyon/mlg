@@ -5,8 +5,8 @@ import pickle
 import networkx as nx
 import torch
 import torch_geometric
-from tqdm import tqdm
 import torch_geometric.transforms as T
+from tqdm import tqdm
 
 import config
 
@@ -140,6 +140,8 @@ def nx2hetero(graph_getter):
     # post-processing
     hetero = torch_geometric.transforms.ToUndirected()(hetero)
     hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
+    hetero = torch_geometric.transforms.ToSparseTensor()(hetero)
+    hetero = torch_geometric.transforms.NormalizeFeatures()(hetero)
     assert hetero.validate()
     return hetero
 
