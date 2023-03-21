@@ -157,7 +157,7 @@ def pipeline(token, playlist_id):
     
     new_track_ids = [id_to_name["track"][i.item()] for i in most_likely.indices]
     add_tracks(token, playlist_id, new_track_ids)
-    return [index["track"][idx] for idx in new_track_ids]
+    return [index["track"][id.split(":")[2]] for id in new_track_ids]
 
 import sys
 if __name__ == "__main__":
