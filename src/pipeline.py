@@ -61,7 +61,7 @@ def get_tracks(token, playlist):
         raise RuntimeError(response.content.decode("utf-8"))
 
     tracks = response.json()["items"]
-    return [track["track"]["uri"].split(":")[-1] for track in tracks]
+    return [track["track"]["uri"] for track in tracks]
 
 
 def count_unique_connections(graph, edge_type, position=1):
@@ -130,8 +130,8 @@ def pipeline(token, playlist_id):
     global graph
     track_ids = get_tracks(token, playlist_id)
     tracks_indices = [name_to_id["track"][track_id] for track_id in track_ids if track_id in name_to_id["track"]]
-    track_names = [index["track"][idx] for idx in track_ids if idx in index["track"]]
-    unknown_tracks = [idx for idx in track_ids if idx not in index["track"]]
+    track_names = [index["track"][idx.split(":")[2]] for idx in track_ids if idx.split(":")[2] in index["track"]]
+    unknown_tracks = [idx.split(":")[2] for idx in track_ids if idx.split(":")[2] not in index["track"]]
 
     print("Tracks in playlist:")
     for track in track_names:
