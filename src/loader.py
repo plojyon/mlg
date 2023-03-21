@@ -102,12 +102,15 @@ def nx2hetero(G, pickle_node_index=None):
         ("track", "includes", "album"): [],
         ("track", "authors", "artist"): []
     }
+    existing_edges = set()
     for edge in G.edges(data=True):
         track_node = edge[0]
         other_node = edge[1]
         if "track" not in track_node:
             track_node, other_node = other_node, track_node
 
+        if (track_node, other_node) in existing_edges:
+            continue
 
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
             s_id = node_id("track", track_node)
@@ -126,6 +129,8 @@ def nx2hetero(G, pickle_node_index=None):
             d_id = node_id("artist", other_node)
 
             edge_index_by_type[("track", "authors", "artist")] += [(s_id, d_id)]
+
+        existing_edges.add((track_node, other_node))
 
     # construct HeteroData
     hetero = torch_geometric.data.HeteroData()
