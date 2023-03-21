@@ -8,6 +8,8 @@ class GNN(torch.nn.Module):
         super().__init__()
         self.conv1 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
         self.conv2 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
+        self.conv3 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
+        self.conv4 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
 
 
     def forward(self, x, edge_index):
@@ -15,22 +17,43 @@ class GNN(torch.nn.Module):
         x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
         x = self.conv2(x, edge_index)
         x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
+        x = self.conv3(x, edge_index)
+        x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
+        x = self.conv4(x, edge_index)
+        x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
         return x
 
     def reset_parameters(self):
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
         self.conv3.reset_parameters()
+        self.conv4.reset_parameters()
 
 class LinkPredictor(torch.nn.Module):
+
+    def __init__(self):
+        super().__init__()
+        self.linear1 = torch.nn.LazyLinear(64)
+        self.linear2 = torch.nn.LazyLinear(1)
+
     def forward(self, x_track, x_playlist, track_playlist_edge):
         track_embedding = x_track[track_playlist_edge[0]]
         playlist_embedding = x_playlist[track_playlist_edge[1]]
 
+        #print(track_embedding.shape)
+        #print(playlist_embedding.shape)
+
+
         #print(playlist_embedding)
 
         # Apply dot-product to get a prediction per supervision edge:
-        return (playlist_embedding * track_embedding).sum(dim=-1)
+
+        linear_in = torch.cat([track_embedding, playlist_embedding], dim=-1)
+        linear_out = self.linear1(linear_in)
+        linear_out = torch.nn.functional.leaky_relu(linear_out, negative_slope=0.2)
+        linear_out = self.linear2(linear_out)
+
+        return linear_out.reshape(-1)
 
 class HeteroModel(torch.nn.Module):
     def __init__(self, hidden_channels, node_features, metadata):
