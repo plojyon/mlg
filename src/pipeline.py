@@ -1,10 +1,10 @@
 import pickle
 import torch
 
-graph_location = "spotify_million_playlist_dataset/pickles/top-ghetero-5000-fixed-maybe.pkl"
-model_location = "spotify_million_playlist_dataset/pickles/carloss72.pkl"
-name2id_location = "spotify_million_playlist_dataset/pickles/top-idx-5000.pkl"
-index_location = "spotify_million_playlist_dataset/pickles/index.pkl"
+graph_location = "../spotify_million_playlist_dataset/pickles/top-ghetero-5000-fixed-maybe.pkl"
+model_location = "../spotify_million_playlist_dataset/pickles/carloss72.pkl"
+name2id_location = "../spotify_million_playlist_dataset/pickles/top-idx-5000.pkl"
+index_location = "../spotify_million_playlist_dataset/pickles/index.pkl"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 graph = pickle.load(open(graph_location, "rb"))
