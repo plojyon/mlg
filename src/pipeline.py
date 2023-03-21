@@ -121,8 +121,10 @@ def add_playlist(graph, playlist):
 
 def pipeline(token, playlist_id):
     track_ids = get_tracks(token, playlist_id)
-    track_names = [index["track"][idx] for idx in track_ids]
-    print("Tracks in playlist: {}".format(len(track_names)))
+    track_names = [index["track"][idx] for idx in track_ids if idx in index["track"]]
+    unknown_tracks = [idx for idx in track_ids if idx not in index["track"]]
+    print("Tracks in playlist: {}".format(track_names))
+    print("Unknown tracks: {}".format(unknown_tracks))
 
     graph = graph.to("cpu")
     add_playlist(graph, {
