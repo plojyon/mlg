@@ -109,10 +109,16 @@ def nx2hetero(G, pickle_node_index=None):
         if "track" not in track_node:
             track_node, other_node = other_node, track_node
 
+        if other_node == "spotify:playlist:248269":
+            print("found it")
+            print(track_node, other_node, edge)
+
         if (track_node, other_node) in existing_edges:
             continue
 
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
+
+
             s_id = node_id("track", track_node)
             d_id = node_id("playlist", other_node)
 
