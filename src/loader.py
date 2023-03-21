@@ -120,6 +120,7 @@ def nx2hetero(G, validate=False):
 
             edge_index_by_type[("track", "authors", "artist")] += [(s_id, d_id)]
 
+    raise NotImplementedError(f'{max(node_features_by_type["playlist"])} versus {edge_index_by_type[("track", "contains", "playlist")]}')
     # construct HeteroData
     hetero = torch_geometric.data.HeteroData()
 
