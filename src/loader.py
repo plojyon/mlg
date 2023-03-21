@@ -103,11 +103,13 @@ def nx2hetero(G, validate=False):
         ("track", "authors", "artist"): []
     }
     for edge in G.edges(data=True):
+        if edge[0] != "track": continue
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
             s_id = node_id("track", edge[0])
             d_id = node_id("playlist", edge[1])
 
             edge_index_by_type[("track", "contains", "playlist")] += [(s_id, d_id)]
+            
         elif G[edge[0]][edge[1]]["edge_type"] == "track-album":
             s_id = node_id("track", edge[0])
             d_id = node_id("album", edge[1])
