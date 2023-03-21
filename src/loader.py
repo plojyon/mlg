@@ -32,7 +32,7 @@ def load_graph(config=config):
                     G.add_edge(track["track_uri"], track["artist_uri"], edge_type="track-artist")
     return G
 
-def nx2hetero(G, validate=False):
+def nx2hetero(G):
     """Convert a nx.Graph into a torch_geometric.data.HeteroData object."""
     ids_by_type = {
         "playlist": {},
@@ -137,11 +137,9 @@ def nx2hetero(G, validate=False):
     hetero["track", "authors", "artist"].edge_index = torch.tensor(edge_index_by_type[("track", "authors", "artist")]).t()
 
     # post-processing
-    if validate: assert hetero.validate()
     hetero = torch_geometric.transforms.ToUndirected()(hetero)
     # hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
     hetero = torch_geometric.transforms.NormalizeFeatures()(hetero)
-    if validate: assert hetero.validate()
     return hetero
 
 def ghetero2datasets(ghetero):
