@@ -2,6 +2,7 @@ import itertools
 import time
 import pickle
 import config
+import networkx as nx
 
 def get_neigh_of_edge_type(G, edge_type, node):
     undirected_neigh = itertools.chain(G.neighbors(node), G.predecessors(node))
