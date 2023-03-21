@@ -153,6 +153,7 @@ def pipeline(token, playlist_id):
 
     with torch.no_grad():
         pred = model(graph)
+        pred[tracks_indices] = -1
         most_likely = torch.topk(pred, 10, dim=0)
     
     new_track_ids = [id_to_name["track"][i.item()] for i in most_likely.indices]
