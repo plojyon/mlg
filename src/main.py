@@ -2,7 +2,6 @@ import numpy as np
 import torch
 import torch_geometric
 import torch_geometric.transforms as T
-import tqdm
 from matplotlib import pyplot as plt
 
 import config
@@ -41,6 +40,9 @@ class Main():
         # Load data
         ghetero = loader.get_ghetero(use_cache, config)
         data_train, data_val, data_test = loader.get_datasets(use_cache, config)
+        self.data_train = data_train
+        self.data_val = data_val
+        self.data_test = data_test
 
         # Create model
         self.model = M.HeteroModel(args["hidden_size"], ghetero.x_dict, ghetero.metadata(), args["sage_args"], args["linear_layer_weights"])

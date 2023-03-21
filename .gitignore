@@ -1,1 +1,8 @@
+# personal notebooks for testing
 src/personal_test.ipynb
+
+# python cache
+*/__pycache__
+
+# data
+spotify_million_playlist_dataset/
