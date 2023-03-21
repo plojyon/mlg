@@ -1,5 +1,9 @@
+import sys
+sys.path.insert(0, '/home/yon/jupyter-server/mlg/src/')
 import pickle
 import torch
+import requests
+from model import *
 
 graph_location = "../spotify_million_playlist_dataset/pickles/top-ghetero-5000-fixed-maybe.pkl"
 model_location = "../spotify_million_playlist_dataset/pickles/carloss72.pkl"
