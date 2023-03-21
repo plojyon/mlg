@@ -73,6 +73,20 @@ def dummy_generator(source):
 
 outs = []
 
+def test(model, data_test):
+    test_out = model(data_test.to(device)).to('cpu')
+    truth = data_test["track", "contains", "playlist"].edge_label.to('cpu')
+
+    test_loss = torch.nn.functional.mse_loss(
+        test_out,
+        truth
+    )
+
+    metric.update(test_out, truth)
+    return float(test), metric.compute()
+
+metric = BinaryAccuracy()
+
 def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
     model.train()
 
@@ -97,8 +111,6 @@ def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
         )
         loss.backward()
         optimizer.step()
-
-        metric = BinaryAccuracy()
 
         aute_gledam = out.to('cpu')
 
