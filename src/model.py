@@ -81,11 +81,9 @@ def test(model, data_test):
         test_out,
         truth
     )
-
+    metric = BinaryAccuracy()
     metric.update(test_out, truth)
     return float(test_loss), metric.compute()
-
-metric = BinaryAccuracy()
 
 def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
     model.train()
@@ -116,6 +114,7 @@ def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
 
         outs.append(aute_gledam)
 
+        metric = BinaryAccuracy()
         metric.update(aute_gledam, truth.to('cpu'))
         accuracy += metric.compute() * len(out)
 
