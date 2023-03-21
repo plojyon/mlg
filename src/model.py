@@ -7,35 +7,37 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class GNN(torch.nn.Module):
     def __init__(self, hidden_channels):
         super().__init__()
-        self.conv1 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
-        self.conv2 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
-        self.conv3 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
-        self.conv4 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
+        self.conv1 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True, bias=True, dropout_prob=0.1)
+        self.conv2 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True, bias=True, dropout_prob=0.1)
+        self.conv3 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels)
+        #self.conv4 = torch_geometric.nn.SAGEConv((-1, -1), hidden_channels, normalize=True, dropout=True)
+
+        self.reset_parameters()
 
 
     def forward(self, x, edge_index):
         x = self.conv1(x, edge_index)
-        x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
+        x = torch.nn.functional.leaky_relu(x, negative_slope=0.1)
         x = self.conv2(x, edge_index)
-        x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
+        x = torch.nn.functional.leaky_relu(x, negative_slope=0.1)
         x = self.conv3(x, edge_index)
-        x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
-        x = self.conv4(x, edge_index)
-        x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
+        #x = torch.nn.functional.leaky_relu(x, negative_slope=0.5)
+        #x = self.conv4(x, edge_index)
+        #x = torch.nn.functional.leaky_relu(x, negative_slope=0.2)
         return x
 
     def reset_parameters(self):
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
         self.conv3.reset_parameters()
-        self.conv4.reset_parameters()
+        #self.conv4.reset_parameters()
 
 class LinkPredictor(torch.nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.linear1 = torch.nn.LazyLinear(64)
-        self.linear2 = torch.nn.LazyLinear(1)
+        #self.linear1 = torch.nn.LazyLinear(32)
+        #self.linear2 = torch.nn.LazyLinear(1)
 
     def forward(self, x_track, x_playlist, track_playlist_edge):
         track_embedding = x_track[track_playlist_edge[0]]
@@ -49,12 +51,12 @@ class LinkPredictor(torch.nn.Module):
 
         # Apply dot-product to get a prediction per supervision edge:
 
-        linear_in = torch.cat([track_embedding, playlist_embedding], dim=-1)
-        linear_out = self.linear1(linear_in)
-        linear_out = torch.nn.functional.leaky_relu(linear_out, negative_slope=0.2)
-        linear_out = self.linear2(linear_out)
+        #linear_in = torch.cat([track_embedding, playlist_embedding], dim=-1)
+        #linear_out = self.linear1(linear_in)
+        #linear_out = torch.nn.functional.leaky_relu(linear_out, negative_slope=0.2)
+        #linear_out = self.linear2(linear_out)
 
-        return linear_out.reshape(-1)
+        return (track_embedding * playlist_embedding).sum(dim=-1)
 
 class HeteroModel(torch.nn.Module):
     def __init__(self, hidden_channels, node_features, metadata):
@@ -101,8 +103,9 @@ def dummy_generator(source):
 outs = []
 
 def test(model, data_test):
-    test_out = model(data_test.to(device)).to('cpu')
-    truth = data_test["track", "contains", "playlist"].edge_label.to('cpu')
+    with torch.no_grad():
+        test_out = model(data_test.to(device)).to('cpu')
+        truth = data_test["track", "contains", "playlist"].edge_label.to('cpu')
 
     test_loss = torch.nn.functional.mse_loss(
         test_out,
@@ -110,7 +113,7 @@ def test(model, data_test):
     )
     metric = BinaryAccuracy()
     metric.update(test_out, truth)
-    return float(test_loss), metric.compute()
+    return float(test_loss), metric.compute(), test_out, truth
 
 def train(model, train_loader, optimizer, batch_wrapper=dummy_generator):
     model.train()
