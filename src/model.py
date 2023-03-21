@@ -82,7 +82,7 @@ def test(model, data_test):
         truth
     )
 
-    metric.update(test_loss, truth.to('cpu'))
+    metric.update(test_out, truth)
     return float(test), metric.compute()
 
 metric = BinaryAccuracy()
