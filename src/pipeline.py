@@ -8,19 +8,15 @@ from model import *
 graph_location = "../spotify_million_playlist_dataset/pickles/top-ghetero-5000-fixed-maybe.pkl"
 model_location = "../spotify_million_playlist_dataset/pickles/carloss72.pkl"
 name2id_location = "../spotify_million_playlist_dataset/pickles/top-idx-5000.pkl"
-index_location = "../spotify_million_playlist_dataset/pickles/index.pkl"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Unpickling 1/5: graph")
+print("Unpickling 1/3: graph")
 graph = pickle.load(open(graph_location, "rb"))
-print("Unpickling 2/5: model")
+print("Unpickling 2/3: model")
 model = pickle.load(open(model_location, "rb"))
-print("Unpickling 3/5: name2id")
+print("Unpickling 3/3: name2id")
 name_to_id = pickle.load(open(name2id_location, "rb"))
 id_to_name = {T: {v : k for k, v in dictionary.items()} for T, dictionary in name_to_id.items()}
-print("Unpickling 4/5: index")
-index = pickle.load(open(index_location, "rb"))
-print("Unpicking 5/5: your're mom")
 
 def add_tracks(token, playlist, tracks):
     headers = {
@@ -130,8 +126,9 @@ def pipeline(token, playlist_id):
     global graph
     track_ids = get_tracks(token, playlist_id)
     tracks_indices = [name_to_id["track"][track_id] for track_id in track_ids if track_id in name_to_id["track"]]
-    track_names = [index["track"][idx.split(":")[2]] for idx in track_ids if idx.split(":")[2] in index["track"]]
-    unknown_tracks = [idx.split(":")[2] for idx in track_ids if idx.split(":")[2] not in index["track"]]
+
+    track_names = [name_to_id["track"][idx] for idx in track_ids if idx in name_to_id["track"]]
+    unknown_tracks = [idx for idx in track_ids if idx not in name_to_id["track"]]
 
     print("Tracks in playlist:")
     for track in track_names:
@@ -158,7 +155,7 @@ def pipeline(token, playlist_id):
     
     new_track_ids = [id_to_name["track"][i.item()] for i in most_likely.indices]
     add_tracks(token, playlist_id, new_track_ids)
-    return [index["track"][id.split(":")[2]] for id in new_track_ids]
+    return [id.split(":")[2] for id in new_track_ids]
 
 import sys
 if __name__ == "__main__":
