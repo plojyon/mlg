@@ -32,7 +32,7 @@ def load_graph(config=config):
                     G.add_edge(track["track_uri"], track["artist_uri"], edge_type="track-artist")
     return G
 
-def nx2hetero(G, validate=False):
+def nx2hetero(G, pickle_node_index=None):
     """Convert a nx.Graph into a torch_geometric.data.HeteroData object."""
     ids_by_type = {
         "playlist": {},
@@ -40,7 +40,7 @@ def nx2hetero(G, validate=False):
         "artist": {},
         "album": {}
     }
-    
+
     def node_id(node_type, id):
         d = ids_by_type[node_type]
         if id not in d:
@@ -103,11 +103,13 @@ def nx2hetero(G, validate=False):
         ("track", "authors", "artist"): []
     }
     for edge in G.edges(data=True):
+        if edge[0][8:13] != "track": continue
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
             s_id = node_id("track", edge[0])
             d_id = node_id("playlist", edge[1])
 
             edge_index_by_type[("track", "contains", "playlist")] += [(s_id, d_id)]
+            
         elif G[edge[0]][edge[1]]["edge_type"] == "track-album":
             s_id = node_id("track", edge[0])
             d_id = node_id("album", edge[1])
@@ -120,15 +122,14 @@ def nx2hetero(G, validate=False):
 
             edge_index_by_type[("track", "authors", "artist")] += [(s_id, d_id)]
 
-    raise NotImplementedError(f'{ {f"{d}={len(d)}" for d in ids_by_type} } abdabdabd {len(node_features_by_type["playlist"])} versus {edge_index_by_type[("track", "contains", "playlist")]}')
     # construct HeteroData
     hetero = torch_geometric.data.HeteroData()
 
     # add initial node features
-    hetero["playlist"].x = torch.FloatTensor(node_features_by_type["playlist"]).reshape(-1,1)
-    hetero["track"].x = torch.FloatTensor(node_features_by_type["track"]).reshape(-1,1)
-    hetero["artist"].x = torch.FloatTensor(node_features_by_type["artist"]).reshape(-1,1)
-    hetero["album"].x = torch.FloatTensor(node_features_by_type["album"]).reshape(-1,1)
+    hetero["playlist"].x = torch.FloatTensor(node_features_by_type["playlist"]).reshape(-1,len(node_features_by_type["playlist"][0]))
+    hetero["track"].x = torch.FloatTensor(node_features_by_type["track"]).reshape(-1,len(node_features_by_type["track"][0]))
+    hetero["artist"].x = torch.FloatTensor(node_features_by_type["artist"]).reshape(-1,len(node_features_by_type["artist"][0]))
+    hetero["album"].x = torch.FloatTensor(node_features_by_type["album"]).reshape(-1,len(node_features_by_type["album"][0]))
 
     # add edge indices
     hetero["track", "contains", "playlist"].edge_index = torch.tensor(edge_index_by_type[("track", "contains", "playlist")]).t()
@@ -136,11 +137,14 @@ def nx2hetero(G, validate=False):
     hetero["track", "authors", "artist"].edge_index = torch.tensor(edge_index_by_type[("track", "authors", "artist")]).t()
 
     # post-processing
-    if validate: assert hetero.validate()
     hetero = torch_geometric.transforms.ToUndirected()(hetero)
     # hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
     hetero = torch_geometric.transforms.NormalizeFeatures()(hetero)
-    if validate: assert hetero.validate()
+
+    # save node index
+    if pickle_node_index is not None:
+        pickle.dump(ids_by_type, open(pickle_node_index, "wb"))
+        print("Saved node index to", pickle_node_index)
     return hetero
 
 def ghetero2datasets(ghetero):
