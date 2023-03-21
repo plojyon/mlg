@@ -11,12 +11,16 @@ name2id_location = "../spotify_million_playlist_dataset/pickles/top-idx-5000.pkl
 index_location = "../spotify_million_playlist_dataset/pickles/index.pkl"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Unpickling 1/5: graph")
 graph = pickle.load(open(graph_location, "rb"))
+print("Unpickling 2/5: model")
 model = pickle.load(open(model_location, "rb"))
+print("Unpickling 3/5: name2id")
 name_to_id = pickle.load(open(name2id_location, "rb"))
 id_to_name = {T: {v : k for k, v in dictionary.items()} for T, dictionary in name_to_id.items()}
+print("Unpickling 4/5: index")
 index = pickle.load(open(index_location, "rb"))
-
+print("Unpicking 5/5: your're mom")
 
 def add_tracks(token, playlist, tracks):
     headers = {
@@ -141,4 +145,4 @@ def pipeline(token, playlist_id):
 if __name__ == "__main__":
     token = "BQDa6MSn76FGEYYHkPhx_W-7LrbS0qAdaTXPsvCmhs3p-1b8gxi5AhXYb_Aa05TqQnbqyzBAPhFqeEmyLnP-mh85HlWRY_IzsxV2qxvKfoDC6l8y2FkESa_VKzxcZ-wmDEAjQN-1bCv7WRxup14VbHQPB42RIOOu5kG1QJBo23EWggSixyumeMVoAS4gkHHBHBy-j8mkkJ41ArrVBrSprTe-qiRcOLA1oea3cuxZn3aHtMMypFr1CEEqTfSjx_Ax6Q"
     playlist_id = "37i9dQZF1DXcBWIGoYBM5M"
-    print(pipeline(token, playlist_id))
+    print("Tracks added: {}".format(pipeline(token, playlist_id)))
