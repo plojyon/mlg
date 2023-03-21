@@ -71,13 +71,16 @@ class HeteroModel(torch.nn.Module):
         self.gnn = torch_geometric.nn.to_hetero(self.gnn, metadata=metadata).to(device)
 
         self.classifier = LinkPredictor().to(device)
-
-    def forward(self, data):
+    
+    def embed(self, data):
         x_dict = {
             k: self.node_lin[k](v) for k, v in data.x_dict.items()
         }
-
         x_dict = self.gnn(x_dict, data.edge_index_dict)
+        return x_dict
+
+    def forward(self, data):
+        x_dict = self.embed(data)
         pred = self.classifier(
             x_dict["track"],
             x_dict["playlist"],
