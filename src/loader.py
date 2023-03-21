@@ -125,6 +125,8 @@ def nx2hetero(G, pickle_node_index=None):
             edge_index_by_type[("track", "includes", "album")] += [(s_id, d_id)]
 
         elif G[edge[0]][edge[1]]["edge_type"] == "track-artist":
+            if track_node == "spotify:track:7o2CTH4ctstm8TNelqjb51":
+                print("track-artist", track_node, other_node)
             s_id = node_id("track", track_node)
             d_id = node_id("artist", other_node)
 
