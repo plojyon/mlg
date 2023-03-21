@@ -58,7 +58,7 @@ def get_tracks(token, playlist):
         headers=headers,
     )
     if response.status_code // 100 != 2:
-        print(response.content.decode("utf-8"))
+        raise RuntimeError(response.content.decode("utf-8"))
 
     tracks = response.json()["items"]
     return [track["track"]["uri"].split(":")[-1] for track in tracks]
