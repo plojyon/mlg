@@ -1,7 +1,7 @@
 import requests
 import json
 
-token = "BQDa6MSn76FGEYYHkPhx_W-7LrbS0qAdaTXPsvCmhs3p-1b8gxi5AhXYb_Aa05TqQnbqyzBAPhFqeEmyLnP-mh85HlWRY_IzsxV2qxvKfoDC6l8y2FkESa_VKzxcZ-wmDEAjQN-1bCv7WRxup14VbHQPB42RIOOu5kG1QJBo23EWggSixyumeMVoAS4gkHHBHBy-j8mkkJ41ArrVBrSprTe-qiRcOLA1oea3cuxZn3aHtMMypFr1CEEqTfSjx_Ax6Q"
+token = "BQCBFR_URJjTO5tTxTf1-2vwHtxsvQhnETfBLCFh6m82FIFHlA16npksr7iYVuZAHfY1ayNtN0AYsmCEEFLGQo504oAuDQAj0BIZ50ihCQcWIn2HMvxLTHccuiYb7VpeHJ67XU1SYantb9SQllVRPJmc1chW157cjQceRT_NWBNX0o4WQDOGvNfHeXm3s-NbdsoHCl5jHqaqxSOUx8KtXBWd01xMDmI6LenykFj_lAUDzJ_lLGWi7_Hw2VT8Js1nRg"
 
 def make_playlist(token, name, desc, user, public=False):
     headers = {
@@ -85,7 +85,11 @@ def add_tracks(token, playlist, tracks):
 
     response = requests.post(f'https://api.spotify.com/v1/playlists/{playlist}/tracks', params=params, headers=headers)
     if response.status_code // 100 != 2:
-        raise RuntimeError(response.content.decode("utf-8"))
+        print(response.content.decode("utf-8"))
+        # retry one by one
+        if len(tracks) > 1:
+            for track in tracks:
+                add_tracks(token, playlist, [track])
 
 
 def get_tracks(token, playlist):
@@ -107,7 +111,7 @@ def get_tracks(token, playlist):
     tracks = response.json()["items"]
     return [track["track"]["uri"].split(":")[-1] for track in tracks]
 
-playlist_id = make_playlist(token, "New Playlist 2", "My new playlist", "316yrpt7nwy7lnxo2ihtwdwez65u").split(":")[-1]
+playlist_id = make_playlist(token, "Carlos playlist #1 base", "My new playlist", "316yrpt7nwy7lnxo2ihtwdwez65u").split(":")[-1]
 tracks = [
     'spotify:track:5UTZUFeHTZSBzd80m5qLnv',
     'spotify:track:2rfRICVLPoWlFVGx7f48Cw',
