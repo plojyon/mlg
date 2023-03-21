@@ -143,6 +143,6 @@ def pipeline(token, playlist_id):
     return [index["track"][idx] for idx in new_track_ids]
 
 if __name__ == "__main__":
-    token = "BQDa6MSn76FGEYYHkPhx_W-7LrbS0qAdaTXPsvCmhs3p-1b8gxi5AhXYb_Aa05TqQnbqyzBAPhFqeEmyLnP-mh85HlWRY_IzsxV2qxvKfoDC6l8y2FkESa_VKzxcZ-wmDEAjQN-1bCv7WRxup14VbHQPB42RIOOu5kG1QJBo23EWggSixyumeMVoAS4gkHHBHBy-j8mkkJ41ArrVBrSprTe-qiRcOLA1oea3cuxZn3aHtMMypFr1CEEqTfSjx_Ax6Q"
+    token = "BQCBFR_URJjTO5tTxTf1-2vwHtxsvQhnETfBLCFh6m82FIFHlA16npksr7iYVuZAHfY1ayNtN0AYsmCEEFLGQo504oAuDQAj0BIZ50ihCQcWIn2HMvxLTHccuiYb7VpeHJ67XU1SYantb9SQllVRPJmc1chW157cjQceRT_NWBNX0o4WQDOGvNfHeXm3s-NbdsoHCl5jHqaqxSOUx8KtXBWd01xMDmI6LenykFj_lAUDzJ_lLGWi7_Hw2VT8Js1nRg"
     playlist_id = "37i9dQZF1DXcBWIGoYBM5M"
     print("Tracks added: {}".format(pipeline(token, playlist_id)))
