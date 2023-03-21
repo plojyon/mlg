@@ -32,7 +32,7 @@ def load_graph(config=config):
                     G.add_edge(track["track_uri"], track["artist_uri"], edge_type="track-artist")
     return G
 
-def nx2hetero(G):
+def nx2hetero(G, pickle_node_index=None):
     """Convert a nx.Graph into a torch_geometric.data.HeteroData object."""
     ids_by_type = {
         "playlist": {},
@@ -40,7 +40,7 @@ def nx2hetero(G):
         "artist": {},
         "album": {}
     }
-    
+
     def node_id(node_type, id):
         d = ids_by_type[node_type]
         if id not in d:
@@ -140,6 +140,11 @@ def nx2hetero(G):
     hetero = torch_geometric.transforms.ToUndirected()(hetero)
     # hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
     hetero = torch_geometric.transforms.NormalizeFeatures()(hetero)
+
+    # save node index
+    if pickle_node_index is not None:
+        pickle.dump(ids_by_type, open(pickle_node_index, "wb"))
+        print("Saved node index to", pickle_node_index)
     return hetero
 
 def ghetero2datasets(ghetero):
