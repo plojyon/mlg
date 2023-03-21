@@ -1,6 +1,7 @@
-from torcheval.metrics import BinaryAccuracy
 import torch
 import torch_geometric
+from torcheval.metrics import BinaryAccuracy
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class GNN(torch.nn.Module):

@@ -103,22 +103,27 @@ def nx2hetero(G, pickle_node_index=None):
         ("track", "authors", "artist"): []
     }
     for edge in G.edges(data=True):
-        if edge[0][8:13] != "track": continue
+        track_node = edge[0]
+        other_node = edge[1]
+        if "track" not in track_node:
+            track_node, other_node = other_node, track_node
+
+
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
-            s_id = node_id("track", edge[0])
-            d_id = node_id("playlist", edge[1])
+            s_id = node_id("track", track_node)
+            d_id = node_id("playlist", other_node)
 
             edge_index_by_type[("track", "contains", "playlist")] += [(s_id, d_id)]
             
         elif G[edge[0]][edge[1]]["edge_type"] == "track-album":
-            s_id = node_id("track", edge[0])
-            d_id = node_id("album", edge[1])
+            s_id = node_id("track", track_node)
+            d_id = node_id("album", other_node)
 
             edge_index_by_type[("track", "includes", "album")] += [(s_id, d_id)]
 
         elif G[edge[0]][edge[1]]["edge_type"] == "track-artist":
-            s_id = node_id("track", edge[0])
-            d_id = node_id("artist", edge[1])
+            s_id = node_id("track", track_node)
+            d_id = node_id("artist", other_node)
 
             edge_index_by_type[("track", "authors", "artist")] += [(s_id, d_id)]
 
