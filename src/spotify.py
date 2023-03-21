@@ -90,7 +90,8 @@ def add_tracks(token, playlist, tracks):
         if len(tracks) > 1:
             for track in tracks:
                 add_tracks(token, playlist, [track])
-
+    else:
+        print("Added tracks to playlist:", tracks)
 
 def get_tracks(token, playlist):
     headers = {
