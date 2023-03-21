@@ -137,7 +137,7 @@ def nx2hetero(G, validate=False):
     # post-processing
     if validate: assert hetero.validate()
     hetero = torch_geometric.transforms.ToUndirected()(hetero)
-    hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
+    # hetero = torch_geometric.transforms.RemoveIsolatedNodes()(hetero)
     hetero = torch_geometric.transforms.NormalizeFeatures()(hetero)
     if validate: assert hetero.validate()
     return hetero
