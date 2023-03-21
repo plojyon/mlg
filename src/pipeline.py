@@ -153,9 +153,7 @@ def pipeline(token, playlist_id):
 
     with torch.no_grad():
         pred = model(graph)
-        print(tracks_indices, pred)
-        pred[tracks_indices] = -1
-        print(pred[tracks_indices])
+        pred[tracks_indices] = -1  # do not predict tracks already on the playlist
         most_likely = torch.topk(pred, 10, dim=0)
     
     new_track_ids = [id_to_name["track"][i.item()] for i in most_likely.indices]
@@ -164,6 +162,6 @@ def pipeline(token, playlist_id):
 
 import sys
 if __name__ == "__main__":
-    token = sys.argv[1]  # "BQCBFR_URJjTO5tTxTf1-2vwHtxsvQhnETfBLCFh6m82FIFHlA16npksr7iYVuZAHfY1ayNtN0AYsmCEEFLGQo504oAuDQAj0BIZ50ihCQcWIn2HMvxLTHccuiYb7VpeHJ67XU1SYantb9SQllVRPJmc1chW157cjQceRT_NWBNX0o4WQDOGvNfHeXm3s-NbdsoHCl5jHqaqxSOUx8KtXBWd01xMDmI6LenykFj_lAUDzJ_lLGWi7_Hw2VT8Js1nRg"
-    playlist_id = sys.argv[2]  # "37i9dQZF1DXcBWIGoYBM5M"
+    token = sys.argv[1]
+    playlist_id = sys.argv[2]
     print("Tracks added: {}".format(pipeline(token, playlist_id)))
