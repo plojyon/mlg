@@ -118,7 +118,7 @@ def add_playlist(graph, playlist):
         graph["track", "includes", "album"].edge_index = torch.cat((graph["track", "includes", "album"].edge_index, torch.LongTensor([[track_id], [album_id]])), dim=1)
 
     # Construct index of all track connections to new playlist for prediction
-    track_ids = torch.LongTensor([i for i in range(len(graph["track"].x)) if i not in playlist["tracks"]])
+    track_ids = torch.LongTensor([i for i in range(len(graph["track"].x))])
     playlist_ids = torch.LongTensor([playlist_id] * len(track_ids))
     new_playlist_tracks_edge_index = torch.cat((track_ids.reshape(1, -1), playlist_ids.reshape(1, -1)), dim=0)
     graph["track", "contains", "playlist"].edge_label_index = new_playlist_tracks_edge_index
