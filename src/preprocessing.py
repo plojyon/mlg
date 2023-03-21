@@ -3,6 +3,7 @@ import time
 import pickle
 import config
 import networkx as nx
+from tqdm import tqdm
 
 def get_neigh_of_edge_type(G, edge_type, node):
     undirected_neigh = itertools.chain(G.neighbors(node), G.predecessors(node))
@@ -29,14 +30,15 @@ def get_smart_playlist_subset(G, playlists_to_keep):
     return keep_nodes
 
 def smart_split(G, splits=[100,500,1000,5000,10000], pickle_location=config.pickled_top_G):
-    for i in splits:
+    for i in tqdm(splits):
         print(f"[{i}] started")
         start = time.time()
         playlists_to_keep = top_n_by_followers(G, i, "playlist")
         print(f"[{i}] got top n playlists in {time.time() - start} seconds")
         start = time.time()
         keep_nodes = get_smart_playlist_subset(G, playlists_to_keep)
-        print(f"[{i}] finshed getting neighbors in {time.time() - start} seconds ({len(keep_nodes)} nodes))")
+        print(f"[{i}] finshed getting neighbors in {time.time() - start} seconds")
+        print(f"\t({len(keep_nodes)} nodes = {len(keep_nodes)/len(G.nodes)} % of graph)")
         start = time.time()
         G_sub = nx.Graph(G.subgraph(keep_nodes))
         print(f"[{i}] finished subgraphing in {time.time() - start} seconds")
