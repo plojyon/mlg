@@ -126,10 +126,10 @@ def nx2hetero(G, validate=False):
     hetero = torch_geometric.data.HeteroData()
 
     # add initial node features
-    hetero["playlist"].x = torch.FloatTensor(node_features_by_type["playlist"]).reshape(-1,1)
-    hetero["track"].x = torch.FloatTensor(node_features_by_type["track"]).reshape(-1,1)
-    hetero["artist"].x = torch.FloatTensor(node_features_by_type["artist"]).reshape(-1,1)
-    hetero["album"].x = torch.FloatTensor(node_features_by_type["album"]).reshape(-1,1)
+    hetero["playlist"].x = torch.FloatTensor(node_features_by_type["playlist"]).reshape(-1,len(node_features_by_type["playlist"][0]))
+    hetero["track"].x = torch.FloatTensor(node_features_by_type["track"]).reshape(-1,len(node_features_by_type["track"][0]))
+    hetero["artist"].x = torch.FloatTensor(node_features_by_type["artist"]).reshape(-1,len(node_features_by_type["artist"][0]))
+    hetero["album"].x = torch.FloatTensor(node_features_by_type["album"]).reshape(-1,len(node_features_by_type["album"][0]))
 
     # add edge indices
     hetero["track", "contains", "playlist"].edge_index = torch.tensor(edge_index_by_type[("track", "contains", "playlist")]).t()
