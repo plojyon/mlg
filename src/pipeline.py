@@ -35,7 +35,7 @@ def add_tracks(token, playlist, tracks):
 
     response = requests.post(f'https://api.spotify.com/v1/playlists/{playlist}/tracks', params=params, headers=headers)
     if response.status_code // 100 != 2:
-        raise RuntimeError(response.content.decode("utf-8"))
+        print(response.content.decode("utf-8"))
 
 
 def get_tracks(token, playlist):
@@ -52,7 +52,7 @@ def get_tracks(token, playlist):
         headers=headers,
     )
     if response.status_code // 100 != 2:
-        raise RuntimeError(response.content.decode("utf-8"))
+        print(response.content.decode("utf-8"))
 
     tracks = response.json()["items"]
     return [track["track"]["uri"].split(":")[-1] for track in tracks]
