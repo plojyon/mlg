@@ -32,8 +32,7 @@ def load_graph(config=config):
                     G.add_edge(track["track_uri"], track["artist_uri"], edge_type="track-artist")
     return G
 
-def nx2hetero(graph_getter):
-    G = graph_getter
+def nx2hetero(G):
     """Convert a nx.Graph into a torch_geometric.data.HeteroData object."""
     ids_by_type = {
         "playlist": {},
@@ -97,7 +96,6 @@ def nx2hetero(graph_getter):
         elif t == "album":
             distances = nx.single_source_shortest_path_length(G, node[0], cutoff=2)
             node_features_by_type["album"] += [[len(distances)]]
-    print(node_features_by_type["playlist"][0])
 
     edge_index_by_type = {
         ("track", "contains", "playlist"): [],
@@ -108,8 +106,6 @@ def nx2hetero(graph_getter):
         if G[edge[0]][edge[1]]["edge_type"] == "track-playlist":
             s_id = node_id("track", edge[0])
             d_id = node_id("playlist", edge[1])
-
-            node_features_by_type["track"][s_id] 
 
             edge_index_by_type[("track", "contains", "playlist")] += [(s_id, d_id)]
         elif G[edge[0]][edge[1]]["edge_type"] == "track-album":
@@ -146,9 +142,9 @@ def nx2hetero(graph_getter):
     return hetero
 
 def ghetero2datasets(ghetero):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     """Split the dataset into train, validation and test sets."""
     transform = T.Compose([
+        T.NormalizeFeatures(),
         T.RandomLinkSplit(
             num_val=0.1,
             num_test=0.1,
