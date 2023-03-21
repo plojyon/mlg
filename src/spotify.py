@@ -1,7 +1,7 @@
 import requests
 import json
 
-token = "BQDa6MSn76FGEYYHkPhx_W-7LrbS0qAdaTXPsvCmhs3p-1b8gxi5AhXYb_Aa05TqQnbqyzBAPhFqeEmyLnP-mh85HlWRY_IzsxV2qxvKfoDC6l8y2FkGSa_VKzxcZ-wmDEAjQN-1bCv7WRxup14VbHQPB42RIOOu5kK1QJBo23EWggSixyumeMVoAS4gkHHBHBy-j8mkkJ41crrVBrSprTe-qiRcOLA1oea3cuxZn3aHtMMypFr1CEEqTfSjx_Ax6X"
+token = "BQDa6MSn76FGEYYHkPhx_W-7LrbS0qAdaTXPsvCmhs3p-1b8gxi5AhXYb_Aa05TqQnbqyzBAPhFqeEmyLnP-mh85HlWRY_IzsxV2qxvKfoDC6l8y2FkESa_VKzxcZ-wmDEAjQN-1bCv7WRxup14VbHQPB42RIOOu5kG1QJBo23EWggSixyumeMVoAS4gkHHBHBy-j8mkkJ41ArrVBrSprTe-qiRcOLA1oea3cuxZn3aHtMMypFr1CEEqTfSjx_Ax6Q"
 
 def make_playlist(token, name, desc, user, public=False):
     headers = {
