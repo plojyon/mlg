@@ -1,9 +1,7 @@
 import subprocess
 import sys
 
-subprocess.check_call([sys.executable, "-m", "pip", "install", "torch-sparse"])
-
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 
 #import sys
@@ -320,11 +318,13 @@ import sys
 if __name__ == "__main__":
     token = sys.argv[1]
     playlist_id = sys.argv[2]
-    print("Tracks added: {}".format(pipeline(token, playlist_id)))
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/")
-def index():
-    return "Hello this is the new version!"
+@app.route("/extend", methods = ["POST"])
+def extend():
+    # get token and playlist id from request
+    token = request.json["token"]
+    playlist_id = request.json["playlist_id"]
+    return "Tracks added: {}".format(pipeline(token, playlist_id))
