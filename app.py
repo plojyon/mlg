@@ -1,3 +1,8 @@
+import subprocess
+import sys
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "torch-sparse"])
+
 from flask import Flask
 from flask_cors import CORS
 
@@ -6,8 +11,6 @@ from flask_cors import CORS
 import pickle
 import torch
 import requests
-
-import torch
 import torch_geometric
 from torcheval.metrics import BinaryAccuracy
 
