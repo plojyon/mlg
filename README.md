@@ -9,3 +9,13 @@ The dataset used to train the model is a collection of user-generated playlists 
 
 Model Architecture
 The GNN model used in this project is a variation of the Graph Convolutional Network (GCN) architecture. The model takes as input a graph with song nodes and calculates the node embeddings using graph convolutions. The embeddings are then fed into a multi-layer perceptron (MLP) to predict the likelihood of each song to fit into the playlist. The model is trained using a binary cross-entropy loss function.
+
+# File Structure
+
+- *documents* folder contains pdfs and other documents related to projects documentation and presentation
+- *images* folder contains images used for projects presentation
+- *personal_tests* folder is intended for jupyter notebooks that should not be committed to the repository
+- *spotify_million_playlist_dataset* folder contains the dataset used for the project it is ommited from the repository due to its size
+- *src* folder contains custom written functions and classes used in the project it also contains a file called *final.ipynb* which is the main jupyter notebook that includes the whole pipeline of the project
+- *testing* folder contains jupyter notebooks used for testing and debugging
+- *app.py* is the file used for running trained models on a web application

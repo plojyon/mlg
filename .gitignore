@@ -1,5 +1,5 @@
 # personal notebooks for testing
-src/personal_test.ipynb
+personal_tests/
 
 # python cache
 */__pycache__
