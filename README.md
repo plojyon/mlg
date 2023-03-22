@@ -15,6 +15,7 @@ The GNN model used in this project is a variation of the Graph Convolutional Net
 - *documents* folder contains pdfs and other documents related to projects documentation and presentation
 - *images* folder contains images used for projects presentation
 - *personal_tests* folder is intended for jupyter notebooks that should not be committed to the repository
+- *pickles* includes pickled files that have saved models, graphs and other data structures used in the project
 - *spotify_million_playlist_dataset* folder contains the dataset used for the project it is ommited from the repository due to its size
 - *src* folder contains custom written functions and classes used in the project it also contains a file called *final.ipynb* which is the main jupyter notebook that includes the whole pipeline of the project
 - *testing* folder contains jupyter notebooks used for testing and debugging
