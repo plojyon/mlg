@@ -1,11 +1,10 @@
 import subprocess
 import sys
+import json
 
 from flask import Flask, request
 from flask_cors import CORS
 
-#import sys
-#sys.path.insert(0, '/home/yon/jupyter-server/mlg/src/')
 import pickle
 import torch
 import requests
@@ -184,9 +183,8 @@ def extend():
     token = request.json["token"]
     playlist_id = request.json["playlist_id"]
     u,t,n = pipeline(token, playlist_id)
-    return str({"unknown":u, "tracks_added":n})
+    return json.dumps({"unknown":u, "tracks_added":n})
 
-import sys
 if __name__ == "__main__":
     #token = sys.argv[1]
     #playlist_id = sys.argv[2]
