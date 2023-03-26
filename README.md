@@ -20,3 +20,7 @@ The GNN model used in this project is a variation of the Graph Convolutional Net
 - *src* folder contains custom written functions and classes used in the project it also contains a file called *final.ipynb* which is the main jupyter notebook that includes the whole pipeline of the project
 - *testing* folder contains jupyter notebooks used for testing and debugging
 - *app.py* is the file used for running trained models on a web application
+
+# Running the Model
+
+To run the model you can locally run app.py or use the provided Dockerfile to run the model in a container.

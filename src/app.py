@@ -13,6 +13,7 @@ from torcheval.metrics import BinaryAccuracy
 
 import model
 import io
+import os
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -26,6 +27,13 @@ class CPU_Unpickler(pickle.Unpickler):
 graph_location = "../pickles/top-ghetero-5000-fixed-maybe.pkl_cpu.pkl"
 model_location = "../pickles/carloss72.pkl_cpu.pkl"
 name2id_location = "../pickles/top-idx-5000.pkl"
+
+if 'X_GRAPH_LOCATION' in os.environ:
+    graph_location = os.environ['X_GRAPH_LOCATION']
+if 'X_MODEL_LOCATION' in os.environ:
+    model_location = os.environ['X_MODEL_LOCATION']
+if 'X_NAME2ID_LOCATION' in os.environ:
+    name2id_location = os.environ['X_NAME2ID_LOCATION']
 
 print("Unpickling 1/3: graph")
 graph = pickle.load(open(graph_location, "rb"))
@@ -184,6 +192,10 @@ def extend():
     playlist_id = request.json["playlist_id"]
     u,t,n = pipeline(token, playlist_id)
     return json.dumps({"unknown":u, "tracks_added":n})
+
+@app.route("/", methods = ["GET"])
+def hello():
+    return "Hello World!"
 
 if __name__ == "__main__":
     #token = sys.argv[1]

@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  mlg:
+    image: mlg
+    build: .
+    volumes:
+      - ./pickles:/app/pickles
+    environment:
+      - X_GRAPH_LOCATION=/app/pickles/top-ghetero-5000-fixed-maybe.pkl_cpu.pkl
+      - X_MODEL_LOCATION=/app/pickles/carloss72.pkl_cpu.pkl
+      - X_NAME2ID_LOCATION=/app/pickles/top-idx-5000.pkl
+    ports:
+      - 80:5000 # expose port 5000 to the host
