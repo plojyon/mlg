@@ -181,22 +181,26 @@ def pipeline(token, playlist_id):
     add_tracks(token, playlist_id, new_track_ids)
     return unknown_tracks, track_names, [id.split(":")[2] for id in new_track_ids]
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="./static/")
 CORS(app)
 
 @app.route("/authenticate", methods = ["GET"])
 def authenticate():
     # https://accounts.spotify.com/authorize?response_type=token&client_id=aa0fd7d8abeb43cbabd76193ee7c7f4a&redirect_uri=carloss.yon.si/auth
     client_id = "aa0fd7d8abeb43cbabd76193ee7c7f4a"
-    redirect_uri = "http://carloss.yon.si/auth"
+    redirect_uri = "http://localhost:5000/auth/"
     response_type = "token"
 
     url = "https://accounts.spotify.com/authorize?response_type={}&client_id={}&redirect_uri={}".format(response_type, client_id, redirect_uri)
     return redirect(url)
 
-@app.route("/auth", methods = ["GET"])
-def auth():
-    return json.dumps({"token": request.args.get("access_token"), "get_request": request.args.get, "body": request.json})
+@app.route('/auth/', defaults={'path': ''}, methods = ["GET"])
+@app.route('/auth/<path:path>')
+def auth(path):
+    print("Recieved:", path)
+
+    # return frontend.html file
+    return app.send_static_file("frontend.html")
 
 
 @app.route("/extend", methods = ["POST"])
@@ -204,6 +208,8 @@ def extend():
     # get token and playlist id from request
     token = request.json["token"]
     playlist_id = request.json["playlist_id"]
+    # if playlist_id is empty return list of playlists
+    # otherwise extend playlist
     u,t,n = pipeline(token, playlist_id)
     return json.dumps({"unknown":u, "tracks_added":n})
 

@@ -167,16 +167,7 @@
       </div>
     </section>
     <section class="body">
-      <form id='form'>
-        To use this app, you must create a spotify token. You can do that via
-        the
-        <a target="_blank" href="https://developer.spotify.com/console/post-playlists/"
-          >spotify dev console</a
-        ><br />
-        <input type="text" placeholder="Spotify api token" />
-        <input type="text" placeholder="Playlist id" />
-        <input type="submit" value="🎵 Expand my playlist 🎵" />
-      </form>
+      <button><a href="/authenticate">Authorize App</a></button>
       </br>
       <div id="loading">
         Loading...
@@ -210,8 +201,8 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            token:document.getElementsByTagName("input")[0].value,
-            playlist_id: document.getElementsByTagName("input")[1].value
+            // parse token from anchor
+            token: window.location.hash.split('&')[0].split('=')[1],
           }),
         }).then(res => res.json())
         .then(data => {
