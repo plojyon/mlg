@@ -1,19 +1,18 @@
+import io
+import json
+import os
+import pickle
 import subprocess
 import sys
-import json
 
-from flask import Flask, request
-from flask_cors import CORS
-
-import pickle
-import torch
 import requests
+import torch
 import torch_geometric
+from flask import Flask, redirect, request
+from flask_cors import CORS
 from torcheval.metrics import BinaryAccuracy
 
 import model
-import io
-import os
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -185,6 +184,21 @@ def pipeline(token, playlist_id):
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/authenticate", methods = ["GET"])
+def authenticate():
+    # https://accounts.spotify.com/authorize?response_type=token&client_id=aa0fd7d8abeb43cbabd76193ee7c7f4a&redirect_uri=carloss.yon.si/auth
+    client_id = "aa0fd7d8abeb43cbabd76193ee7c7f4a"
+    redirect_uri = "http://carloss.yon.si/auth"
+    response_type = "token"
+
+    url = "https://accounts.spotify.com/authorize?response_type={}&client_id={}&redirect_uri={}".format(response_type, client_id, redirect_uri)
+    return redirect(url)
+
+@app.route("/auth", methods = ["GET"])
+def auth():
+    return json.dumps({"token": request.args.get("access_token"), "get_request": request.args.get, "body": request.json})
+
+
 @app.route("/extend", methods = ["POST"])
 def extend():
     # get token and playlist id from request
@@ -197,10 +211,12 @@ def extend():
 def hello():
     return "Hello World!"
 
+
 if __name__ == "__main__":
     #token = sys.argv[1]
     #playlist_id = sys.argv[2]
-    app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0")
+    app.run()
     print("Carloss has launched!!")
     print("Welcome to the best backend ever written")
 
