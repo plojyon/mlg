@@ -3,12 +3,20 @@ version: '3'
 services:
   mlg:
     image: mlg
+    container_name: mlg
     build: .
     volumes:
       - ./pickles:/app/pickles
+      - ./src/:/home/appuser/app/
     environment:
       - X_GRAPH_LOCATION=/app/pickles/top-ghetero-5000-fixed-maybe.pkl_cpu.pkl
       - X_MODEL_LOCATION=/app/pickles/carloss72.pkl_cpu.pkl
       - X_NAME2ID_LOCATION=/app/pickles/top-idx-5000.pkl
-    ports:
-      - 80:5000 # expose port 5000 to the host
+      - VIRTUAL_PATH=/mlg/
+      - VIRTUAL_DEST=/
+      - VIRTUAL_HOST=kerikon.ddns.net
+      - LETSENCRYPT_HOST=kerikon.ddns.net
+      - VIRTUAL_PORT=5000
+    network_mode: net
+    working_dir: /home/appuser/app
+    command: "sh -c 'python3 -m app'"
