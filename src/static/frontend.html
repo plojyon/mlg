@@ -274,7 +274,7 @@
           body: JSON.stringify({
             // parse token from anchor
             token,
-            playlist_id: document.getElementsByTagName("input")[1].value,
+            playlist_id: document.getElementById("playlist_id").value,
           }),
         }).then(res => res.json())
         .then(data => {
