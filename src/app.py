@@ -188,20 +188,11 @@ CORS(app)
 def authenticate():
     # https://accounts.spotify.com/authorize?response_type=token&client_id=aa0fd7d8abeb43cbabd76193ee7c7f4a&redirect_uri=carloss.yon.si/auth
     client_id = "aa0fd7d8abeb43cbabd76193ee7c7f4a"
-    redirect_uri = "http://localhost:5000/auth/"
+    redirect_uri = "http://localhost:5000/"
     response_type = "token"
 
     url = "https://accounts.spotify.com/authorize?response_type={}&client_id={}&redirect_uri={}".format(response_type, client_id, redirect_uri)
     return redirect(url)
-
-@app.route('/auth/', defaults={'path': ''}, methods = ["GET"])
-@app.route('/auth/<path:path>')
-def auth(path):
-    print("Recieved:", path)
-
-    # return frontend.html file
-    return app.send_static_file("frontend.html")
-
 
 @app.route("/extend", methods = ["POST"])
 def extend():
@@ -213,9 +204,13 @@ def extend():
     u,t,n = pipeline(token, playlist_id)
     return json.dumps({"unknown":u, "tracks_added":n})
 
-@app.route("/", methods = ["GET"])
-def hello():
-    return "Hello World!"
+@app.route('/', defaults={'path': ''}, methods = ["GET"])
+@app.route('/<path:path>')
+def auth(path):
+    print("Recieved:", path)
+
+    # return frontend.html file
+    return app.send_static_file("frontend.html")
 
 
 if __name__ == "__main__":
